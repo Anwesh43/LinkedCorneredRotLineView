@@ -189,4 +189,27 @@ class CorneredRotLineView(ctx : Context) : View(ctx) {
             curr.startUpdating(cb)
         }
     }
+
+    data class Renderer(var view : CorneredRotLineView) {
+
+        private val animator : Animator = Animator(view)
+        private val crl : CorneredRotLine = CorneredRotLine(0)
+        private val paint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+        fun renderer(canvas : Canvas) {
+            canvas.drawColor(backColor)
+            crl.draw(canvas, paint)
+            animator.animate {
+                crl.update {
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            crl.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
