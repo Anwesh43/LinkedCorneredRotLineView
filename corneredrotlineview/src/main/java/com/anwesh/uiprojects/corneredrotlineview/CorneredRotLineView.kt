@@ -214,4 +214,13 @@ class CorneredRotLineView(ctx : Context) : View(ctx) {
             }
         }
     }
+
+    companion object {
+
+        fun create(activity : Activity) : CorneredRotLineView {
+            val view : CorneredRotLineView = CorneredRotLineView(activity)
+            activity.setContentView(view)
+            return view
+        }
+    }
 }
