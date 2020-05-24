@@ -15,13 +15,13 @@ import android.content.Context
 val nodes : Int = 5
 val lines : Int = 2
 val upLines : Int = 2
-val scGap : Float = 0.02f
+val scGap : Float = 0.04f / (2 * upLines * lines)
 val strokeFactor : Int = 90
 val sizeFactor : Float = 2.9f
 val foreColor : Int = Color.parseColor("#4CAF50")
 val backColor : Int = Color.parseColor("#BDBDBD")
 val rotDeg : Float = 90f
-val delay : Long = 20
+val delay : Long = 10
 
 fun Int.inverse() : Float = 1f / this
 fun Float.maxScale(i : Int, n : Int) : Float = Math.max(0f, this - i * n.inverse())
@@ -31,6 +31,7 @@ fun Float.sinify() : Float = Math.sin(this * Math.PI).toFloat()
 fun Canvas.drawCorneredRotLine(i : Int, scale : Float, size : Float, paint : Paint) {
     val sci : Float = scale.divideScale(i, lines)
     save()
+    scale(1f - 2 * i, 1f)
     translate(size, size)
     rotate(rotDeg * sci)
     drawLine(0f, 0f, -size, 0f, paint)
@@ -39,12 +40,20 @@ fun Canvas.drawCorneredRotLine(i : Int, scale : Float, size : Float, paint : Pai
 
 fun Canvas.drawCorneredRotLines(scale : Float, size : Float, paint : Paint) {
     val sf : Float = scale.sinify()
+    val sf1 : Float = sf.divideScale(0, 2)
+    val sf2 : Float = sf.divideScale(1, 2)
+    save()
+    rotate(rotDeg * sf2)
     for (i in 0..(upLines - 1)) {
-        val sfi : Float = sf.divideScale(i, upLines)
+        save()
+        scale(1f, 1f - 2 * i)
+        val sfi : Float = sf1.divideScale(i, upLines)
         for (j in 0..(lines - 1)) {
-            drawCorneredRotLine(i, sfi, size, paint)
+            drawCorneredRotLine(j, sfi, size, paint)
         }
+        restore()
     }
+    restore()
 }
 
 fun Canvas.drawCRLNode(i : Int, scale : Float, paint : Paint) {
@@ -56,7 +65,8 @@ fun Canvas.drawCRLNode(i : Int, scale : Float, paint : Paint) {
     paint.strokeCap = Paint.Cap.ROUND
     paint.strokeWidth = Math.min(w, h) / strokeFactor
     save()
-    translate(w / 2, gap * (i + 1))
+    translate(w / 2, gap * (i + 1) - gap / 2)
+    drawLine(-w / 2, gap / 2, w / 2, gap / 2, paint)
     drawCorneredRotLines(scale, size, paint)
     restore()
 }
